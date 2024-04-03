@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "751792703942",
+    "project_id": "snake-22a81",
+    "storage_bucket": "snake-22a81.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751792703942:android:59fec8e48eaf0b8e054ac7",
+        "android_client_info": {
+          "package_name": "com.vlad.snake"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo8O0lMIgyKN9kyq00yRjLDHz47Iory5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

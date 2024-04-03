@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:snake/pages/home_page.dart';
-// import "package:firebase_core/firebase_core.dart";
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(
-  //   options: const FirebaseOptions(
-  //       apiKey: "AIzaSyAnAVQTpX4cCvdz7umuUQ0r9yBCf262q5U",
-  //       authDomain: "snake-6f4f7.firebaseapp.com",
-  //       projectId: "snake-6f4f7",
-  //       storageBucket: "snake-6f4f7.appspot.com",
-  //       messagingSenderId: "734275804445",
-  //       appId: "1:734275804445:web:252658954ffe451942d5f4",
-  //       measurementId: "G-9JE2SSX32R"),
-  // );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

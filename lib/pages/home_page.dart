@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:snake/components/blank_feild.dart';
 import 'package:snake/components/food.dart';
 import 'package:snake/components/snake.dart';
+import 'package:snake/models/result_model.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +21,40 @@ class HomePage extends StatefulWidget {
 enum SnakeDirection { UP, DOWN, LEFT, RIGHT }
 
 class _HomePageState extends State<HomePage> {
+  Future<void> signInAnonymously() async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInAnonymously();
+      User? user = userCredential.user;
+      debugPrint("Signed in anoymously: ${user!.uid}");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> addResultToFireBase(
+      String name, int result, String userId) async {
+    try {
+      await results
+          .doc(userId)
+          .set(Result(
+            name: nameController.text,
+            result: foodCount,
+            userId: userId,
+          ).toDocument())
+          .then(
+            (value) => print("Result Added"),
+          )
+          .catchError(
+            (error) => print(
+              "Failed to add the result $error",
+            ),
+          );
+    } catch (e) {
+      print(e);
+    }
+  }
+
   int rowSize = 10;
   int area = 100;
   int foodPos = 45;
@@ -24,10 +63,13 @@ class _HomePageState extends State<HomePage> {
   bool isStarted = false;
 
   List<int> snakePos = [0, 1, 2];
+  final results = FirebaseFirestore.instance.collection('results');
+  TextEditingController nameController = TextEditingController();
 
   var snakeDirection = SnakeDirection.RIGHT;
 
   startGame() {
+    signInAnonymously();
     isStarted = true;
     Timer.periodic(const Duration(milliseconds: 200), (timer) {
       setState(() {
@@ -45,13 +87,21 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     "Your score: $foodCount",
                     style: const TextStyle(
-                        fontSize: 25, fontWeight: FontWeight.w600),
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  const TextField(),
+                  TextField(
+                    controller: nameController,
+                  ),
                   MaterialButton(
                     color: Colors.blue,
-                    onPressed: newGame,
-                    child: const Text('Play Again'),
+                    onPressed: () {
+                      newGame();
+                      addResultToFireBase(
+                          nameController.text, foodCount, const Uuid().v1());
+                    },
+                    child: const Text('Save result'),
                   ),
                 ],
               );
