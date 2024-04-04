@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:snake/components/blank_feild.dart';
 import 'package:snake/components/food.dart';
+import 'package:snake/components/medal.dart';
 import 'package:snake/components/snake.dart';
 import 'package:snake/models/result_model.dart';
 import 'package:uuid/uuid.dart';
@@ -27,6 +28,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Result> result = [];
+
+  void sort() {
+    for (var i = 0; i < result.length; i++) {
+      for (var j = 0; j < result.length - 1 - i; j++) {
+        if (result[j].result < result[j + 1].result) {
+          var temp = result[j + 1];
+          result[j + 1] = result[j];
+          result[j] = temp;
+        }
+      }
+    }
+  }
+
   Future<void> fetchResult() async {
     try {
       var querySnapshot = await results.get();
@@ -39,6 +53,7 @@ class _HomePageState extends State<HomePage> {
             )
             .toList();
       });
+      sort();
     } catch (e) {
       print(e);
       rethrow;
@@ -117,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   TextField(
                     controller: nameController,
-                    maxLength: 6,
+                    maxLength: 9,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -260,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                   width: 200,
                   height: 200,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 75.0),
+                    padding: const EdgeInsets.only(left: 47.0, top: 5),
                     child: ListView.builder(
                       itemCount: result.length,
                       itemBuilder: (context, i) {
@@ -268,27 +283,29 @@ class _HomePageState extends State<HomePage> {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
+                        } else if (i == 0) {
+                          return Medal(
+                            name: result[i].name,
+                            result: result[i].result,
+                            emoji: "🥇",
+                          );
+                        } else if (i == 1) {
+                          return Medal(
+                            name: result[i].name,
+                            result: result[i].result,
+                            emoji: "🥈",
+                          );
+                        } else if (i == 2) {
+                          return Medal(
+                            name: result[i].name,
+                            result: result[i].result,
+                            emoji: "🥉",
+                          );
                         } else {
-                          return SizedBox(
-                            height: 36,
-                            child: ListTile(
-                              leading: Text(
-                                result[i].name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              title: Text(
-                                "${result[i].result}",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                          return Medal(
+                            name: result[i].name,
+                            result: result[i].result,
+                            emoji: "🤦‍♀️",
                           );
                         }
                       },
