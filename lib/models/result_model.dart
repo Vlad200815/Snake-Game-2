@@ -19,6 +19,14 @@ class Result extends Equatable {
     };
   }
 
+  static Result formDocument(Map<String, dynamic> doc) {
+    return Result(
+      name: doc['name'],
+      userId: doc['userId'],
+      result: doc['result'],
+    );
+  }
+
   @override
   List<Object?> get props => [name, result, userId];
 }

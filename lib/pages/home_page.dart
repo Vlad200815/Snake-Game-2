@@ -9,7 +9,6 @@ import 'package:snake/components/food.dart';
 import 'package:snake/components/snake.dart';
 import 'package:snake/models/result_model.dart';
 import 'package:uuid/uuid.dart';
-import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +20,31 @@ class HomePage extends StatefulWidget {
 enum SnakeDirection { UP, DOWN, LEFT, RIGHT }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    fetchResult();
+    super.initState();
+  }
+
+  List<Result> result = [];
+  Future<void> fetchResult() async {
+    try {
+      var querySnapshot = await results.get();
+      setState(() {
+        result = querySnapshot.docs
+            .map(
+              (e) => Result.formDocument(
+                e.data(),
+              ),
+            )
+            .toList();
+      });
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<void> signInAnonymously() async {
     try {
       UserCredential userCredential =
@@ -93,15 +117,34 @@ class _HomePageState extends State<HomePage> {
                   ),
                   TextField(
                     controller: nameController,
+                    maxLength: 6,
                   ),
-                  MaterialButton(
-                    color: Colors.blue,
-                    onPressed: () {
-                      newGame();
-                      addResultToFireBase(
-                          nameController.text, foodCount, const Uuid().v1());
-                    },
-                    child: const Text('Save result'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      MaterialButton(
+                        color: Colors.green,
+                        onPressed: () {
+                          newGame();
+                        },
+                        child: const Text("Cancel"),
+                      ),
+                      const SizedBox(width: 20),
+                      MaterialButton(
+                        color: Colors.blue,
+                        onPressed: () {
+                          addResultToFireBase(
+                            nameController.text,
+                            foodCount,
+                            const Uuid().v1(),
+                          );
+                          fetchResult();
+                          newGame();
+                          nameController.clear();
+                        },
+                        child: const Text('Save result'),
+                      ),
+                    ],
                   ),
                 ],
               );
@@ -197,15 +240,62 @@ class _HomePageState extends State<HomePage> {
         children: [
           Expanded(
             flex: 1,
-            child: Center(
-              child: Text(
-                foodCount.toString(),
-                style: const TextStyle(
-                  fontSize: 50,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Center(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      foodCount.toString(),
+                      style: const TextStyle(
+                        fontSize: 50,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 75.0),
+                    child: ListView.builder(
+                      itemCount: result.length,
+                      itemBuilder: (context, i) {
+                        if (result.isEmpty) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return SizedBox(
+                            height: 36,
+                            child: ListTile(
+                              leading: Text(
+                                result[i].name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              title: Text(
+                                "${result[i].result}",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
